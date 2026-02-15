@@ -44,4 +44,14 @@ public sealed class PhysicalFileSystem : IFileSystem
     /// <inheritdoc />
     public void CopyFile(string sourcePath, string destinationPath, bool overwrite) =>
         File.Copy(sourcePath, destinationPath, overwrite);
+
+    /// <inheritdoc />
+    public string[] GetFiles(string path, string searchPattern, SearchOption searchOption) =>
+        Directory.GetFiles(path, searchPattern, searchOption);
+
+    /// <inheritdoc />
+    public long GetFileSize(string filePath) => new FileInfo(filePath).Length;
+
+    /// <inheritdoc />
+    public Stream OpenRead(string filePath) => File.OpenRead(filePath);
 }

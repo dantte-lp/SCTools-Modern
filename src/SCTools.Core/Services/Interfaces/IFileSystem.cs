@@ -54,4 +54,21 @@ public interface IFileSystem
     /// <param name="destinationPath">Destination file path.</param>
     /// <param name="overwrite">Whether to overwrite existing file.</param>
     void CopyFile(string sourcePath, string destinationPath, bool overwrite);
+
+    /// <summary>Returns the file paths matching a pattern in a directory.</summary>
+    /// <param name="path">Path to the directory.</param>
+    /// <param name="searchPattern">Search pattern (e.g. "*", "*.ini").</param>
+    /// <param name="searchOption">Whether to search subdirectories.</param>
+    /// <returns>Array of matching file paths.</returns>
+    string[] GetFiles(string path, string searchPattern, SearchOption searchOption);
+
+    /// <summary>Gets the size of a file in bytes.</summary>
+    /// <param name="filePath">Path to the file.</param>
+    /// <returns>File size in bytes.</returns>
+    long GetFileSize(string filePath);
+
+    /// <summary>Opens a file for reading.</summary>
+    /// <param name="filePath">Path to the file.</param>
+    /// <returns>A read-only file stream.</returns>
+    Stream OpenRead(string filePath);
 }
