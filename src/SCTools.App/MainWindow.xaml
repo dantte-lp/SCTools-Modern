@@ -68,7 +68,7 @@
             <ui:SnackbarPresenter x:Name="RootSnackbarPresenter" />
 
             <!-- ContentDialog host -->
-            <ContentPresenter x:Name="RootContentDialogPresenter" />
+            <ui:ContentDialogHost x:Name="RootContentDialogPresenter" />
         </Grid>
 
         <!-- System Tray Icon -->

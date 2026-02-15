@@ -21,7 +21,7 @@ RUN apt-get update \
 
 # Install .NET SDK via official install script
 ARG DOTNET_CHANNEL=10.0
-ARG DOTNET_QUALITY=preview
+ARG DOTNET_QUALITY=ga
 
 RUN curl -sSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh \
     && chmod +x /tmp/dotnet-install.sh \

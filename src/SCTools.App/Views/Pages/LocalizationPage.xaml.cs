@@ -1,6 +1,7 @@
 // Licensed to the SCTools project under the MIT license.
 
 using SCTools.Core.ViewModels;
+using Wpf.Ui.Abstractions.Controls;
 using Wpf.Ui.Controls;
 
 namespace SCTools.App.Views.Pages;
@@ -10,9 +11,6 @@ namespace SCTools.App.Views.Pages;
 /// </summary>
 public partial class LocalizationPage : INavigableView<LocalizationViewModel>
 {
-    /// <inheritdoc />
-    public LocalizationViewModel ViewModel { get; }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="LocalizationPage"/> class.
     /// </summary>
@@ -20,6 +18,9 @@ public partial class LocalizationPage : INavigableView<LocalizationViewModel>
     /// <param name="mainViewModel">Main window view model for game mode path binding.</param>
     public LocalizationPage(LocalizationViewModel viewModel, MainWindowViewModel mainViewModel)
     {
+        ArgumentNullException.ThrowIfNull(viewModel);
+        ArgumentNullException.ThrowIfNull(mainViewModel);
+
         ViewModel = viewModel;
         DataContext = this;
 
@@ -35,4 +36,7 @@ public partial class LocalizationPage : INavigableView<LocalizationViewModel>
 
         InitializeComponent();
     }
+
+    /// <inheritdoc />
+    public LocalizationViewModel ViewModel { get; }
 }

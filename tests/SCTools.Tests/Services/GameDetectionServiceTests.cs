@@ -14,6 +14,9 @@ namespace SCTools.Tests.Services;
 /// </summary>
 public sealed class GameDetectionServiceTests
 {
+    private static readonly string TestRoot =
+        Path.Combine(Path.DirectorySeparatorChar + "game", "StarCitizen");
+
     private readonly IFileSystem _fs = Substitute.For<IFileSystem>();
     private readonly GameDetectionService _sut;
 
@@ -28,7 +31,7 @@ public sealed class GameDetectionServiceTests
     [Fact]
     public void DetectInstallations_WhenNoModesExist_ReturnsEmpty()
     {
-        var result = _sut.DetectInstallations("/game/StarCitizen");
+        var result = _sut.DetectInstallations(TestRoot);
 
         result.Should().BeEmpty();
     }
@@ -36,10 +39,9 @@ public sealed class GameDetectionServiceTests
     [Fact]
     public void DetectInstallations_WhenLiveExists_ReturnsSingleInstallation()
     {
-        var root = "/game/StarCitizen";
-        SetupGameMode(root, GameMode.Live, "3.24.0");
+        SetupGameMode(TestRoot, GameMode.Live, "3.24.0");
 
-        var result = _sut.DetectInstallations(root);
+        var result = _sut.DetectInstallations(TestRoot);
 
         result.Should().ContainSingle();
         result[0].Mode.Should().Be(GameMode.Live);
@@ -49,11 +51,10 @@ public sealed class GameDetectionServiceTests
     [Fact]
     public void DetectInstallations_WhenMultipleModesExist_ReturnsAll()
     {
-        var root = "/game/StarCitizen";
-        SetupGameMode(root, GameMode.Live, "3.24.0");
-        SetupGameMode(root, GameMode.Ptu, "3.24.1");
+        SetupGameMode(TestRoot, GameMode.Live, "3.24.0");
+        SetupGameMode(TestRoot, GameMode.Ptu, "3.24.1");
 
-        var result = _sut.DetectInstallations(root);
+        var result = _sut.DetectInstallations(TestRoot);
 
         result.Should().HaveCount(2);
         result.Select(i => i.Mode).Should().Contain([GameMode.Live, GameMode.Ptu]);
@@ -62,10 +63,9 @@ public sealed class GameDetectionServiceTests
     [Fact]
     public void DetectInstallations_WhenDirectoryExistsButNoExe_SkipsMode()
     {
-        var root = "/game/StarCitizen";
-        var livePath = Path.Combine(root, "LIVE");
+        var livePath = Path.Combine(TestRoot, "LIVE");
         _fs.DirectoryExists(livePath).Returns(true);
-        var result = _sut.DetectInstallations(root);
+        var result = _sut.DetectInstallations(TestRoot);
 
         result.Should().BeEmpty();
     }
@@ -73,15 +73,14 @@ public sealed class GameDetectionServiceTests
     [Fact]
     public void DetectInstallations_WhenVersionIsNull_IncludesInstallation()
     {
-        var root = "/game/StarCitizen";
-        var livePath = Path.Combine(root, "LIVE");
+        var livePath = Path.Combine(TestRoot, "LIVE");
         var exePath = GameConstants.GetExePath(livePath);
 
         _fs.DirectoryExists(livePath).Returns(true);
         _fs.FileExists(exePath).Returns(true);
         _fs.GetFileVersion(exePath).Returns((string?)null);
 
-        var result = _sut.DetectInstallations(root);
+        var result = _sut.DetectInstallations(TestRoot);
 
         result.Should().ContainSingle()
             .Which.ExeVersion.Should().BeNull();
@@ -98,42 +97,39 @@ public sealed class GameDetectionServiceTests
     [Fact]
     public void FindGameFolder_WhenDirectPathHasModes_ReturnsPath()
     {
-        var root = "/game/StarCitizen";
-        SetupDirectoryExists(root, GameMode.Live);
+        SetupDirectoryExists(TestRoot, GameMode.Live);
 
-        var result = _sut.FindGameFolder(root);
+        var result = _sut.FindGameFolder(TestRoot);
 
-        result.Should().Be(root);
+        result.Should().Be(TestRoot);
     }
 
     [Fact]
     public void FindGameFolder_WhenInsideBin64_GoesUpTwoLevels()
     {
-        var root = "/game/StarCitizen";
-        var bin64 = Path.Combine(root, "LIVE", "Bin64");
-        SetupDirectoryExists(root, GameMode.Live);
+        var bin64 = Path.Combine(TestRoot, "LIVE", "Bin64");
+        SetupDirectoryExists(TestRoot, GameMode.Live);
 
         var result = _sut.FindGameFolder(bin64);
 
-        result.Should().Be(root);
+        result.Should().Be(TestRoot);
     }
 
     [Fact]
     public void FindGameFolder_WhenInsideModeFolder_GoesUpOneLevel()
     {
-        var root = "/game/StarCitizen";
-        var modeFolder = Path.Combine(root, "LIVE");
-        SetupDirectoryExists(root, GameMode.Live);
+        var modeFolder = Path.Combine(TestRoot, "LIVE");
+        SetupDirectoryExists(TestRoot, GameMode.Live);
 
         var result = _sut.FindGameFolder(modeFolder);
 
-        result.Should().Be(root);
+        result.Should().Be(TestRoot);
     }
 
     [Fact]
     public void FindGameFolder_WhenStarCitizenSubfolderExists_ReturnsIt()
     {
-        var parent = "/game";
+        var parent = Path.DirectorySeparatorChar + "game";
         var scFolder = Path.Combine(parent, "StarCitizen");
         _fs.DirectoryExists(scFolder).Returns(true);
         SetupDirectoryExists(scFolder, GameMode.Live);
@@ -146,7 +142,8 @@ public sealed class GameDetectionServiceTests
     [Fact]
     public void FindGameFolder_WhenNothingFound_ReturnsNull()
     {
-        var result = _sut.FindGameFolder("/empty/path");
+        var path = Path.Combine(Path.DirectorySeparatorChar + "empty", "path");
+        var result = _sut.FindGameFolder(path);
 
         result.Should().BeNull();
     }

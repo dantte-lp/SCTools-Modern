@@ -11,17 +11,19 @@ namespace SCTools.App.Services;
 /// Concrete implementation of <see cref="IUpdateManagerAdapter"/> using Velopack.
 /// This adapter bridges the Core abstraction with the actual Velopack UpdateManager.
 /// </summary>
-public sealed class VelopackUpdateManagerAdapter : IUpdateManagerAdapter
+internal sealed class VelopackUpdateManagerAdapter : IUpdateManagerAdapter
 {
     private readonly UpdateManager _updateManager;
+    private UpdateInfo? _lastUpdateInfo;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="VelopackUpdateManagerAdapter"/> class.
     /// </summary>
-    /// <param name="githubRepoUrl">GitHub repository URL for update source.</param>
-    public VelopackUpdateManagerAdapter(string githubRepoUrl)
+    /// <param name="githubRepoUri">GitHub repository URI for update source.</param>
+    public VelopackUpdateManagerAdapter(Uri githubRepoUri)
     {
-        _updateManager = new UpdateManager(new GithubSource(githubRepoUrl, null, false));
+        ArgumentNullException.ThrowIfNull(githubRepoUri);
+        _updateManager = new UpdateManager(new GithubSource(githubRepoUri.ToString(), null, false));
     }
 
     /// <inheritdoc />
@@ -42,12 +44,14 @@ public sealed class VelopackUpdateManagerAdapter : IUpdateManagerAdapter
             return null;
         }
 
+        _lastUpdateInfo = updateInfo;
+
         return new AppUpdateInfo
         {
             TargetVersion = updateInfo.TargetFullRelease.Version.ToString(),
             CurrentVersion = CurrentVersion ?? "0.0.0",
             FileName = updateInfo.TargetFullRelease.FileName,
-            Size = updateInfo.TargetFullRelease.FileSize,
+            Size = updateInfo.TargetFullRelease.Size,
             IsDowngrade = updateInfo.IsDowngrade,
         };
     }
@@ -60,25 +64,27 @@ public sealed class VelopackUpdateManagerAdapter : IUpdateManagerAdapter
     {
         ArgumentNullException.ThrowIfNull(updateInfo);
 
-        var velopackUpdate = await _updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
+        // Re-check if cached info is stale
+        _lastUpdateInfo ??= await _updateManager.CheckForUpdatesAsync().ConfigureAwait(false);
 
-        if (velopackUpdate is not null)
+        if (_lastUpdateInfo is not null)
         {
             await _updateManager.DownloadUpdatesAsync(
-                velopackUpdate,
-                progress: percentage => progress?.Report(percentage)).ConfigureAwait(false);
+                _lastUpdateInfo,
+                progress: percentage => progress?.Report(percentage),
+                cancelToken: cancellationToken).ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc />
     public void ApplyUpdateAndRestart(string[]? restartArgs = null)
     {
-        _updateManager.ApplyUpdatesAndRestart(restartArgs);
+        _updateManager.ApplyUpdatesAndRestart(_lastUpdateInfo?.TargetFullRelease, restartArgs);
     }
 
     /// <inheritdoc />
     public void ApplyUpdateOnExit()
     {
-        _updateManager.ApplyUpdatesAndExit();
+        _updateManager.ApplyUpdatesAndExit(_lastUpdateInfo?.TargetFullRelease);
     }
 }

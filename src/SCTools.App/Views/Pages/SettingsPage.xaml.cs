@@ -3,6 +3,7 @@
 using System.Windows;
 using Microsoft.Win32;
 using SCTools.Core.ViewModels;
+using Wpf.Ui.Abstractions.Controls;
 using Wpf.Ui.Controls;
 
 namespace SCTools.App.Views.Pages;
@@ -12,19 +13,6 @@ namespace SCTools.App.Views.Pages;
 /// </summary>
 public partial class SettingsPage : INavigableView<SettingsViewModel>
 {
-    /// <inheritdoc />
-    public SettingsViewModel ViewModel { get; }
-
-    /// <summary>
-    /// Gets the current application version string.
-    /// </summary>
-    public string? AppVersion { get; }
-
-    /// <summary>
-    /// Gets the .NET runtime version string.
-    /// </summary>
-    public static string DotNetVersion => Environment.Version.ToString();
-
     /// <summary>
     /// Initializes a new instance of the <see cref="SettingsPage"/> class.
     /// </summary>
@@ -32,12 +20,27 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
     /// <param name="mainViewModel">Main window view model for version info.</param>
     public SettingsPage(SettingsViewModel viewModel, MainWindowViewModel mainViewModel)
     {
+        ArgumentNullException.ThrowIfNull(mainViewModel);
+
         ViewModel = viewModel;
         AppVersion = mainViewModel.AppVersion;
         DataContext = this;
 
         InitializeComponent();
     }
+
+    /// <summary>
+    /// Gets the .NET runtime version string.
+    /// </summary>
+    public static string DotNetVersion => Environment.Version.ToString();
+
+    /// <inheritdoc />
+    public SettingsViewModel ViewModel { get; }
+
+    /// <summary>
+    /// Gets the current application version string.
+    /// </summary>
+    public string? AppVersion { get; }
 
     private void BrowseGameFolder_Click(object sender, RoutedEventArgs e)
     {

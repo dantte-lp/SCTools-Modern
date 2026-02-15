@@ -46,7 +46,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          dotnet-quality: 'preview'
 
       - name: Restore
         run: dotnet restore src/SCTools.Core/ && dotnet restore tests/SCTools.Tests/
@@ -83,7 +82,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          dotnet-quality: 'preview'
 
       - name: Restore
         run: dotnet restore
@@ -146,7 +144,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          dotnet-quality: 'preview'
 
       - name: Restore and publish
         run: >

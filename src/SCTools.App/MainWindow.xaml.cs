@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Windows;
 using SCTools.App.ViewModels;
 using Wpf.Ui;
+using Wpf.Ui.Abstractions;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
@@ -21,17 +22,19 @@ public partial class MainWindow : INavigationWindow
     /// Initializes a new instance of the <see cref="MainWindow"/> class.
     /// </summary>
     /// <param name="navigationService">Navigation service for page routing.</param>
-    /// <param name="pageProvider">Page provider for DI-based page creation.</param>
+    /// <param name="navigationViewPageProvider">Page provider for DI-based page creation.</param>
     /// <param name="viewModel">Shell view model.</param>
     /// <param name="snackbarService">Snackbar notification service.</param>
     /// <param name="contentDialogService">Content dialog service.</param>
     public MainWindow(
         INavigationService navigationService,
-        INavigationViewPageProvider pageProvider,
+        INavigationViewPageProvider navigationViewPageProvider,
         ShellViewModel viewModel,
         ISnackbarService snackbarService,
         IContentDialogService contentDialogService)
     {
+        ArgumentNullException.ThrowIfNull(navigationService);
+
         _snackbarService = snackbarService;
         _contentDialogService = contentDialogService;
 
@@ -41,7 +44,7 @@ public partial class MainWindow : INavigationWindow
 
         // Wire WPF UI services
         navigationService.SetNavigationControl(RootNavigation);
-        RootNavigation.SetPageProviderService(pageProvider);
+        RootNavigation.SetPageProviderService(navigationViewPageProvider);
         _snackbarService.SetSnackbarPresenter(RootSnackbarPresenter);
         _contentDialogService.SetDialogHost(RootContentDialogPresenter);
 
@@ -62,9 +65,9 @@ public partial class MainWindow : INavigationWindow
     }
 
     /// <inheritdoc />
-    public void SetPageService(INavigationViewPageProvider pageProvider)
+    public void SetPageService(INavigationViewPageProvider navigationViewPageProvider)
     {
-        RootNavigation.SetPageProviderService(pageProvider);
+        RootNavigation.SetPageProviderService(navigationViewPageProvider);
     }
 
     /// <inheritdoc />
@@ -76,6 +79,8 @@ public partial class MainWindow : INavigationWindow
     /// <inheritdoc />
     protected override void OnClosing(CancelEventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(e);
+
         // Minimize to tray instead of closing
         e.Cancel = true;
         Hide();

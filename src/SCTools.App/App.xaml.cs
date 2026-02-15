@@ -61,7 +61,7 @@ public partial class App : Application
 
             // Auto-update (Velopack adapter)
             services.AddSingleton<IUpdateManagerAdapter>(_ =>
-                new VelopackUpdateManagerAdapter("https://github.com/dantte-lp/SCTools-Modern"));
+                new VelopackUpdateManagerAdapter(new Uri("https://github.com/dantte-lp/SCTools-Modern")));
             services.AddSingleton<IAutoUpdateService, AutoUpdateService>();
 
             // Core ViewModels (singletons for shared state)

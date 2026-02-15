@@ -7,12 +7,12 @@
     <RootNamespace>SCTools.App</RootNamespace>
     <Description>Star Citizen companion tool — localization management, game settings, auto-updates</Description>
 
-    <!-- Publish settings (RID passed via -r flag in CI; defaults to win-x64 for local dev) -->
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishTrimmed>false</PublishTrimmed>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- Suppress analyzer rules incompatible with WPF applications -->
+    <!-- CA1515: WPF XAML requires public types for instantiation -->
+    <!-- CA1724: App class name in SCTools.App namespace is standard WPF convention -->
+    <!-- CA2007: UI continuations must stay on UI thread — ConfigureAwait not applicable -->
+    <!-- CA1305: Serilog sink methods don't expose IFormatProvider overloads -->
+    <NoWarn>CA1515;CA1724;CA2007;CA1305</NoWarn>
 
     <!-- Application icon -->
     <ApplicationIcon Condition="Exists('Resources\app.ico')">Resources\app.ico</ApplicationIcon>
