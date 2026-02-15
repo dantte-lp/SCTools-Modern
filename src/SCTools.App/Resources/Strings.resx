@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Navigation -->
+  <data name="Nav_Localization" xml:space="preserve"><value>Localization</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
+
+  <!-- Localization Page -->
+  <data name="Loc_Title" xml:space="preserve"><value>Localization</value></data>
+  <data name="Loc_Subtitle" xml:space="preserve"><value>Manage language packs for Star Citizen</value></data>
+  <data name="Loc_InstalledPacks" xml:space="preserve"><value>Installed Language Packs</value></data>
+  <data name="Loc_CheckUpdates" xml:space="preserve"><value>Check for Updates</value></data>
+  <data name="Loc_InstallUpdate" xml:space="preserve"><value>Install Update</value></data>
+  <data name="Loc_Uninstall" xml:space="preserve"><value>Uninstall</value></data>
+  <data name="Loc_ResetEnglish" xml:space="preserve"><value>Reset to English</value></data>
+  <data name="Loc_CurrentLanguage" xml:space="preserve"><value>Current language:</value></data>
+  <data name="Loc_NoFolder" xml:space="preserve"><value>No game folder selected</value></data>
+  <data name="Loc_Ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="Loc_Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Loc_Version" xml:space="preserve"><value>Version</value></data>
+
+  <!-- Settings Page -->
+  <data name="Set_Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Set_GameFolder" xml:space="preserve"><value>Game Folder</value></data>
+  <data name="Set_Browse" xml:space="preserve"><value>Browse...</value></data>
+  <data name="Set_StartMinimized" xml:space="preserve"><value>Start minimized to tray</value></data>
+  <data name="Set_StartMinimizedDesc" xml:space="preserve"><value>Application starts hidden in the system tray</value></data>
+  <data name="Set_IncrementalDownload" xml:space="preserve"><value>Incremental downloads</value></data>
+  <data name="Set_IncrementalDownloadDesc" xml:space="preserve"><value>Only download changed files (saves bandwidth)</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>Automatic update checks</value></data>
+  <data name="Set_AutoUpdateDesc" xml:space="preserve"><value>Periodically check for new localization updates</value></data>
+  <data name="Set_UpdateInterval" xml:space="preserve"><value>Update check interval</value></data>
+  <data name="Set_UpdateIntervalDesc" xml:space="preserve"><value>Time between automatic checks (minutes)</value></data>
+  <data name="Set_Revert" xml:space="preserve"><value>Revert</value></data>
+  <data name="Set_UnsavedChanges" xml:space="preserve"><value>Unsaved changes</value></data>
+  <data name="Set_General" xml:space="preserve"><value>General</value></data>
+  <data name="Set_Updates" xml:space="preserve"><value>Updates</value></data>
+
+  <!-- Download Progress -->
+  <data name="Dl_Downloading" xml:space="preserve"><value>Downloading...</value></data>
+  <data name="Dl_Cancel" xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- Tray -->
+  <data name="Tray_Tooltip" xml:space="preserve"><value>SCTools — Star Citizen Companion</value></data>
+  <data name="Tray_Show" xml:space="preserve"><value>Show SCTools</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>Exit</value></data>
+
+  <!-- Game Mode -->
+  <data name="GameMode_Label" xml:space="preserve"><value>Game Mode:</value></data>
+</root>

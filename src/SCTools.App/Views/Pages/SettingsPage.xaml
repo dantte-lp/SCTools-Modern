@@ -1,0 +1,133 @@
+<Page
+    x:Class="SCTools.App.Views.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    mc:Ignorable="d"
+    d:DesignHeight="600"
+    d:DesignWidth="800"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,16" MaxWidth="600" HorizontalAlignment="Left">
+
+            <!-- Header -->
+            <TextBlock
+                FontSize="28"
+                FontWeight="SemiBold"
+                Text="Settings"
+                Margin="0,0,0,24" />
+
+            <!-- Game Folder -->
+            <TextBlock Text="Game Folder" FontWeight="SemiBold" Margin="0,0,0,8" />
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBox
+                    Grid.Column="0"
+                    Text="{Binding ViewModel.GameFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PlaceholderText="C:\Program Files\RSI\StarCitizen"
+                    Margin="0,0,8,0" />
+                <ui:Button
+                    Grid.Column="1"
+                    Content="Browse..."
+                    Icon="{ui:SymbolIcon FolderOpen24}"
+                    Click="BrowseGameFolder_Click" />
+            </Grid>
+
+            <!-- General Settings -->
+            <TextBlock Text="General" FontWeight="SemiBold" Margin="0,0,0,12" />
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="Start minimized to tray" />
+                        <TextBlock
+                            Text="Application starts hidden in the system tray"
+                            FontSize="12" Opacity="0.7" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch
+                    IsChecked="{Binding ViewModel.RunMinimized, Mode=TwoWay}" />
+            </ui:CardControl>
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="Incremental downloads" />
+                        <TextBlock
+                            Text="Only download changed files (saves bandwidth)"
+                            FontSize="12" Opacity="0.7" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch
+                    IsChecked="{Binding ViewModel.AllowIncrementalDownload, Mode=TwoWay}" />
+            </ui:CardControl>
+
+            <!-- Update Settings -->
+            <TextBlock Text="Updates" FontWeight="SemiBold" Margin="0,16,0,12" />
+
+            <ui:CardControl Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="Automatic update checks" />
+                        <TextBlock
+                            Text="Periodically check for new localization updates"
+                            FontSize="12" Opacity="0.7" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch
+                    IsChecked="{Binding ViewModel.RegularCheckForUpdates, Mode=TwoWay}" />
+            </ui:CardControl>
+
+            <ui:CardControl Margin="0,0,0,24">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Text="Update check interval" />
+                        <TextBlock
+                            Text="Time between automatic checks (minutes)"
+                            FontSize="12" Opacity="0.7" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox
+                    Value="{Binding ViewModel.UpdateCheckIntervalMinutes, Mode=TwoWay}"
+                    Minimum="1"
+                    Maximum="1440"
+                    SpinButtonPlacementMode="Inline"
+                    Width="150" />
+            </ui:CardControl>
+
+            <!-- Action Buttons -->
+            <StackPanel Orientation="Horizontal">
+                <ui:Button
+                    Content="Revert"
+                    Icon="{ui:SymbolIcon ArrowUndo24}"
+                    Command="{Binding ViewModel.RevertCommand}"
+                    IsEnabled="{Binding ViewModel.HasChanges}"
+                    Margin="0,0,8,0" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Opacity="0.7"
+                    Visibility="{Binding ViewModel.HasChanges, Converter={StaticResource BoolToVisConverter}}">
+                    <Run Text="Unsaved changes" />
+                </TextBlock>
+            </StackPanel>
+
+            <!-- Version Info -->
+            <Border
+                Margin="0,32,0,0"
+                Padding="12,8"
+                Background="{DynamicResource ControlFillColorDefaultBrush}"
+                CornerRadius="4">
+                <TextBlock Opacity="0.5" FontSize="12">
+                    <Run Text="SCTools v" /><Run Text="{Binding AppVersion, FallbackValue='dev'}" />
+                    <Run Text=" — .NET " /><Run Text="{Binding DotNetVersion}" />
+                </TextBlock>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

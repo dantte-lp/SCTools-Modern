@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="Nav_Localization" xml:space="preserve"><value>Локализация</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Loc_Title" xml:space="preserve"><value>Локализация</value></data>
+  <data name="Loc_Subtitle" xml:space="preserve"><value>Управление языковыми пакетами Star Citizen</value></data>
+  <data name="Loc_InstalledPacks" xml:space="preserve"><value>Установленные языковые пакеты</value></data>
+  <data name="Loc_CheckUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
+  <data name="Loc_InstallUpdate" xml:space="preserve"><value>Установить обновление</value></data>
+  <data name="Loc_Uninstall" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Loc_ResetEnglish" xml:space="preserve"><value>Сбросить на английский</value></data>
+  <data name="Loc_CurrentLanguage" xml:space="preserve"><value>Текущий язык:</value></data>
+  <data name="Loc_NoFolder" xml:space="preserve"><value>Папка игры не выбрана</value></data>
+  <data name="Loc_Ready" xml:space="preserve"><value>Готово</value></data>
+  <data name="Loc_Language" xml:space="preserve"><value>Язык</value></data>
+  <data name="Loc_Version" xml:space="preserve"><value>Версия</value></data>
+  <data name="Set_Title" xml:space="preserve"><value>Настройки</value></data>
+  <data name="Set_GameFolder" xml:space="preserve"><value>Папка игры</value></data>
+  <data name="Set_Browse" xml:space="preserve"><value>Обзор...</value></data>
+  <data name="Set_StartMinimized" xml:space="preserve"><value>Запуск свёрнутым в трей</value></data>
+  <data name="Set_StartMinimizedDesc" xml:space="preserve"><value>Приложение запускается скрытым в системном трее</value></data>
+  <data name="Set_IncrementalDownload" xml:space="preserve"><value>Инкрементальная загрузка</value></data>
+  <data name="Set_IncrementalDownloadDesc" xml:space="preserve"><value>Загружать только изменённые файлы (экономия трафика)</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>Автоматическая проверка обновлений</value></data>
+  <data name="Set_AutoUpdateDesc" xml:space="preserve"><value>Периодически проверять наличие обновлений локализации</value></data>
+  <data name="Set_UpdateInterval" xml:space="preserve"><value>Интервал проверки обновлений</value></data>
+  <data name="Set_UpdateIntervalDesc" xml:space="preserve"><value>Время между автоматическими проверками (минуты)</value></data>
+  <data name="Set_Revert" xml:space="preserve"><value>Отменить</value></data>
+  <data name="Set_UnsavedChanges" xml:space="preserve"><value>Несохранённые изменения</value></data>
+  <data name="Set_General" xml:space="preserve"><value>Общие</value></data>
+  <data name="Set_Updates" xml:space="preserve"><value>Обновления</value></data>
+  <data name="Dl_Downloading" xml:space="preserve"><value>Загрузка...</value></data>
+  <data name="Dl_Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Tray_Tooltip" xml:space="preserve"><value>SCTools — Помощник Star Citizen</value></data>
+  <data name="Tray_Show" xml:space="preserve"><value>Показать SCTools</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>Выход</value></data>
+  <data name="GameMode_Label" xml:space="preserve"><value>Режим игры:</value></data>
+</root>

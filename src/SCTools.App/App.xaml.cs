@@ -2,19 +2,26 @@
 
 using System.Windows;
 using System.Windows.Threading;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SCTools.App.Services;
 using SCTools.App.ViewModels;
 using SCTools.App.Views.Pages;
+using SCTools.Core.Models;
+using SCTools.Core.Services;
+using SCTools.Core.Services.Interfaces;
+using SCTools.Core.ViewModels;
 using Serilog;
 using Serilog.Events;
+using Velopack;
 using Wpf.Ui;
 using Wpf.Ui.DependencyInjection;
 
 namespace SCTools.App;
 
 /// <summary>
-/// Application entry point with DI container and Serilog logging.
+/// Application entry point with DI container, Serilog logging, and Velopack auto-updates.
 /// </summary>
 public partial class App : Application
 {
@@ -30,8 +37,42 @@ public partial class App : Application
                 "logs/sctools-.log",
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 14))
-        .ConfigureServices((_, services) =>
+        .ConfigureServices((context, services) =>
         {
+            // Configuration
+            services.Configure<AppSettings>(
+                context.Configuration.GetSection(AppSettings.SectionName));
+
+            // Core services
+            services.AddSingleton<IFileSystem, PhysicalFileSystem>();
+            services.AddSingleton<IGameDetectionService, GameDetectionService>();
+            services.AddSingleton<IGameConfigService, GameConfigService>();
+            services.AddSingleton<ILanguagePackService, LanguagePackService>();
+            services.AddSingleton<IFileIndexService, FileIndexService>();
+
+            // HTTP + GitHub API
+            services.AddHttpClient<IGitHubApiService, GitHubApiService>(client =>
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("SCTools/2.0");
+            });
+
+            // Localization updater (depends on IGitHubApiService, ILanguagePackService)
+            services.AddSingleton<ILocalizationUpdater, LocalizationUpdater>();
+
+            // Auto-update (Velopack adapter)
+            services.AddSingleton<IUpdateManagerAdapter>(_ =>
+                new VelopackUpdateManagerAdapter("https://github.com/h0useRus/StarCitizen"));
+            services.AddSingleton<IAutoUpdateService, AutoUpdateService>();
+
+            // Core ViewModels (singletons for shared state)
+            services.AddSingleton<MainWindowViewModel>();
+            services.AddSingleton<LocalizationViewModel>();
+            services.AddSingleton<SettingsViewModel>();
+            services.AddTransient<DownloadProgressViewModel>();
+
+            // App ViewModels
+            services.AddSingleton<ShellViewModel>();
+
             // WPF UI services
             services.AddNavigationViewPageProvider();
             services.AddSingleton<IThemeService, ThemeService>();
@@ -39,15 +80,21 @@ public partial class App : Application
             services.AddSingleton<ISnackbarService, SnackbarService>();
             services.AddSingleton<IContentDialogService, ContentDialogService>();
 
-            // Main window
+            // Main window + pages
             services.AddSingleton<INavigationWindow, MainWindow>();
-            services.AddSingleton<MainWindowViewModel>();
-
-            // Pages
-            services.AddSingleton<DashboardPage>();
-            services.AddSingleton<DashboardViewModel>();
+            services.AddSingleton<LocalizationPage>();
+            services.AddSingleton<SettingsPage>();
         })
         .Build();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="App"/> class.
+    /// Runs Velopack update hooks before any UI code.
+    /// </summary>
+    public App()
+    {
+        VelopackApp.Build().Run();
+    }
 
     /// <summary>
     /// Gets the application-wide service provider.
@@ -61,9 +108,15 @@ public partial class App : Application
 
         await AppHost.StartAsync();
 
+        // Initialize MainWindowViewModel with settings
+        var mainVm = AppHost.Services.GetRequiredService<MainWindowViewModel>();
+        var settings = AppHost.Services
+            .GetRequiredService<Microsoft.Extensions.Options.IOptions<AppSettings>>().Value;
+        mainVm.Initialize(settings);
+
         var navigationWindow = AppHost.Services.GetRequiredService<INavigationWindow>();
         navigationWindow.ShowWindow();
-        navigationWindow.Navigate(typeof(DashboardPage));
+        navigationWindow.Navigate(typeof(LocalizationPage));
     }
 
     /// <inheritdoc />

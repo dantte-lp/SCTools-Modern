@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="Nav_Localization" xml:space="preserve"><value>本地化</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>设置</value></data>
+  <data name="Loc_Title" xml:space="preserve"><value>本地化</value></data>
+  <data name="Loc_Subtitle" xml:space="preserve"><value>管理 Star Citizen 语言包</value></data>
+  <data name="Loc_InstalledPacks" xml:space="preserve"><value>已安装的语言包</value></data>
+  <data name="Loc_CheckUpdates" xml:space="preserve"><value>检查更新</value></data>
+  <data name="Loc_InstallUpdate" xml:space="preserve"><value>安装更新</value></data>
+  <data name="Loc_Uninstall" xml:space="preserve"><value>卸载</value></data>
+  <data name="Loc_ResetEnglish" xml:space="preserve"><value>重置为英语</value></data>
+  <data name="Loc_CurrentLanguage" xml:space="preserve"><value>当前语言：</value></data>
+  <data name="Loc_Ready" xml:space="preserve"><value>就绪</value></data>
+  <data name="Set_Title" xml:space="preserve"><value>设置</value></data>
+  <data name="Set_GameFolder" xml:space="preserve"><value>游戏文件夹</value></data>
+  <data name="Set_Browse" xml:space="preserve"><value>浏览...</value></data>
+  <data name="Set_StartMinimized" xml:space="preserve"><value>启动时最小化到托盘</value></data>
+  <data name="Set_IncrementalDownload" xml:space="preserve"><value>增量下载</value></data>
+  <data name="Set_AutoUpdate" xml:space="preserve"><value>自动检查更新</value></data>
+  <data name="Set_Revert" xml:space="preserve"><value>恢复</value></data>
+  <data name="Dl_Downloading" xml:space="preserve"><value>下载中...</value></data>
+  <data name="Dl_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Tray_Show" xml:space="preserve"><value>显示 SCTools</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>退出</value></data>
+  <data name="GameMode_Label" xml:space="preserve"><value>游戏模式：</value></data>
+</root>

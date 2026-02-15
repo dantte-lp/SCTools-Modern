@@ -1,0 +1,59 @@
+<UserControl
+    x:Class="SCTools.App.Views.Controls.DownloadProgressControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    mc:Ignorable="d"
+    d:DesignWidth="400"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+
+    <StackPanel MinWidth="350">
+        <!-- Title -->
+        <TextBlock
+            FontSize="14"
+            FontWeight="SemiBold"
+            Text="{Binding Title}"
+            Margin="0,0,0,12" />
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            Value="{Binding ProgressPercent, Mode=OneWay}"
+            IsIndeterminate="{Binding IsIndeterminate, Mode=OneWay}"
+            Height="8"
+            Margin="0,0,0,8" />
+
+        <!-- Progress Details -->
+        <Grid Margin="0,0,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Grid.Column="0"
+                FontSize="12"
+                Opacity="0.7"
+                Text="{Binding CurrentFile, FallbackValue=''}" />
+            <TextBlock
+                Grid.Column="1"
+                FontSize="12"
+                Opacity="0.7">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0:N0} / {1:N0} bytes">
+                        <Binding Path="BytesDownloaded" />
+                        <Binding Path="TotalBytes" FallbackValue="?" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </Grid>
+
+        <!-- Cancel Button -->
+        <ui:Button
+            Content="Cancel"
+            Icon="{ui:SymbolIcon Dismiss24}"
+            HorizontalAlignment="Right"
+            Margin="0,12,0,0"
+            Command="{Binding CancelCommand}" />
+    </StackPanel>
+</UserControl>

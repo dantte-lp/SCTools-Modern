@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:SCTools.App.Views.Pages"
+    xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Wpf"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="{Binding ApplicationTitle, Mode=OneWay}"
     Width="1100"
@@ -25,19 +26,73 @@
 
         <ui:TitleBar
             Title="{Binding ApplicationTitle, Mode=OneWay}"
-            Grid.Row="0" />
+            Grid.Row="0">
+            <ui:TitleBar.Header>
+                <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
+                    <!-- Game Mode Selector -->
+                    <TextBlock
+                        Text="Game Mode:"
+                        VerticalAlignment="Center"
+                        Margin="0,0,8,0"
+                        FontSize="12"
+                        Opacity="0.7" />
+                    <ComboBox
+                        ItemsSource="{Binding Main.AvailableGameModes}"
+                        SelectedItem="{Binding Main.SelectedGameMode, Mode=TwoWay}"
+                        MinWidth="100"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+            </ui:TitleBar.Header>
+        </ui:TitleBar>
 
-        <ui:NavigationView
-            x:Name="RootNavigation"
-            Grid.Row="1"
-            PaneDisplayMode="LeftFluent"
-            IsBackButtonVisible="Collapsed">
-            <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem
-                    Content="Dashboard"
-                    Icon="{ui:SymbolIcon Home24}"
-                    TargetPageType="{x:Type pages:DashboardPage}" />
-            </ui:NavigationView.MenuItems>
-        </ui:NavigationView>
+        <Grid Grid.Row="1">
+            <ui:NavigationView
+                x:Name="RootNavigation"
+                PaneDisplayMode="LeftFluent"
+                IsBackButtonVisible="Collapsed">
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem
+                        Content="Localization"
+                        Icon="{ui:SymbolIcon Translate24}"
+                        TargetPageType="{x:Type pages:LocalizationPage}" />
+                </ui:NavigationView.MenuItems>
+                <ui:NavigationView.FooterMenuItems>
+                    <ui:NavigationViewItem
+                        Content="Settings"
+                        Icon="{ui:SymbolIcon Settings24}"
+                        TargetPageType="{x:Type pages:SettingsPage}" />
+                </ui:NavigationView.FooterMenuItems>
+            </ui:NavigationView>
+
+            <!-- Snackbar presenter (bottom notifications) -->
+            <ui:SnackbarPresenter x:Name="RootSnackbarPresenter" />
+
+            <!-- ContentDialog host -->
+            <ContentPresenter x:Name="RootContentDialogPresenter" />
+        </Grid>
+
+        <!-- System Tray Icon -->
+        <tb:TaskbarIcon
+            x:Name="TrayIcon"
+            ToolTipText="SCTools — Star Citizen Companion"
+            MenuActivation="RightClick"
+            TrayLeftMouseDown="TrayIcon_OnTrayLeftMouseDown"
+            Visibility="Visible">
+            <tb:TaskbarIcon.IconSource>
+                <tb:GeneratedIconSource
+                    Text="SC"
+                    Foreground="White"
+                    Background="#0078D4"
+                    FontSize="28"
+                    FontWeight="Bold" />
+            </tb:TaskbarIcon.IconSource>
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Show SCTools" Click="TrayMenu_Show_Click" />
+                    <Separator />
+                    <MenuItem Header="Exit" Click="TrayMenu_Exit_Click" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
     </Grid>
 </ui:FluentWindow>
