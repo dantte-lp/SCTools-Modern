@@ -180,7 +180,7 @@ jobs:
           --mainExe SCTools.exe
           --channel ${{ matrix.runtime }}
           --runtime ${{ matrix.runtime }}
-          --targetDir ./velopack-out
+          --outputDir ./velopack-out
 
       - name: Upload Velopack artifact
         uses: actions/upload-artifact@v4
@@ -212,26 +212,16 @@ jobs:
           path: artifacts/
           pattern: release-*
 
-      - name: Download all Velopack artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: velopack-artifacts/
-          pattern: velopack-*
-
       - name: Collect release files
         shell: bash
         run: |
           mkdir -p release-files
 
-          # ZIP binaries + SHA256
+          # ZIP binaries + SHA256 only
           cp artifacts/release-win-x64/SCTools-win-x64.zip release-files/
           cp artifacts/release-win-x64/SCTools-win-x64.zip.sha256 release-files/
           cp artifacts/release-win-arm64/SCTools-win-arm64.zip release-files/
           cp artifacts/release-win-arm64/SCTools-win-arm64.zip.sha256 release-files/
-
-          # Velopack packages (nupkg, setup, RELEASES)
-          cp velopack-artifacts/velopack-win-x64/* release-files/ 2>/dev/null || true
-          cp velopack-artifacts/velopack-win-arm64/* release-files/ 2>/dev/null || true
 
           echo "### Release files:" >> "$GITHUB_STEP_SUMMARY"
           ls -lh release-files/ >> "$GITHUB_STEP_SUMMARY"
