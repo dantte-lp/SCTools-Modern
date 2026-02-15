@@ -15,16 +15,16 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
 jobs:
-  release:
-    name: Release (${{ matrix.runtime }})
-    runs-on: windows-latest
+  # ──────────────────────────────────────────────
+  # Stage 1: Extract version, run tests on Linux (fast gate)
+  # ──────────────────────────────────────────────
+  test:
+    name: Test (Linux)
+    runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        runtime: [win-x64, win-arm64]
-
-    permissions:
-      contents: write
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Checkout
@@ -32,7 +32,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get version from tag
+      - name: Extract version from tag
         id: version
         shell: bash
         run: |
@@ -40,6 +40,44 @@ jobs:
           VERSION="${TAG#v}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "### Release: $TAG ($VERSION)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Restore
+        run: dotnet restore src/SCTools.Core/ && dotnet restore tests/SCTools.Tests/
+
+      - name: Build Core
+        run: >
+          dotnet build src/SCTools.Core/ -c Release --no-restore
+          -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Build Tests
+        run: dotnet build tests/SCTools.Tests/ -c Release --no-restore
+
+      - name: Run tests
+        run: dotnet test tests/SCTools.Tests/ -c Release --no-build --verbosity normal
+
+  # ──────────────────────────────────────────────
+  # Stage 2: Build + publish on Windows (win-x64, win-arm64)
+  # ──────────────────────────────────────────────
+  build:
+    name: Build (${{ matrix.runtime }})
+    runs-on: windows-latest
+    needs: test
+
+    strategy:
+      fail-fast: true
+      matrix:
+        runtime: [win-x64, win-arm64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
@@ -53,20 +91,73 @@ jobs:
       - name: Build
         run: >
           dotnet build -c Release --no-restore
-          -p:Version=${{ steps.version.outputs.version }}
+          -p:Version=${{ needs.test.outputs.version }}
 
-      - name: Test
+      - name: Test (full solution, Windows)
         run: dotnet test -c Release --no-build --verbosity normal
 
-      - name: Publish
+      - name: Publish self-contained
         run: >
           dotnet publish src/SCTools.App/SCTools.App.csproj
-          -c Release -r ${{ matrix.runtime }}
+          -c Release
+          -r ${{ matrix.runtime }}
           --self-contained true
           -p:PublishSingleFile=true
           -p:PublishReadyToRun=true
           -p:IncludeNativeLibrariesForSelfExtract=true
-          -p:Version=${{ steps.version.outputs.version }}
+          -p:Version=${{ needs.test.outputs.version }}
+          -o publish/${{ matrix.runtime }}
+
+      - name: Create ZIP archive
+        shell: pwsh
+        run: |
+          Compress-Archive -Path publish/${{ matrix.runtime }}/* -DestinationPath SCTools-${{ matrix.runtime }}.zip
+          $hash = (Get-FileHash SCTools-${{ matrix.runtime }}.zip -Algorithm SHA256).Hash
+          echo "SHA256: $hash" >> $env:GITHUB_STEP_SUMMARY
+          echo "$hash  SCTools-${{ matrix.runtime }}.zip" > SCTools-${{ matrix.runtime }}.zip.sha256
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.runtime }}
+          path: |
+            SCTools-${{ matrix.runtime }}.zip
+            SCTools-${{ matrix.runtime }}.zip.sha256
+          retention-days: 7
+
+  # ──────────────────────────────────────────────
+  # Stage 3: Velopack delta packages
+  # ──────────────────────────────────────────────
+  velopack:
+    name: Velopack (${{ matrix.runtime }})
+    runs-on: windows-latest
+    needs: [test, build]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [win-x64, win-arm64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Restore and publish
+        run: >
+          dotnet publish src/SCTools.App/SCTools.App.csproj
+          -c Release
+          -r ${{ matrix.runtime }}
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:PublishReadyToRun=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:Version=${{ needs.test.outputs.version }}
           -o publish/${{ matrix.runtime }}
 
       - name: Install Velopack CLI
@@ -85,28 +176,109 @@ jobs:
         run: >
           vpk pack
           --packId SCTools
-          --packVersion ${{ steps.version.outputs.version }}
+          --packVersion ${{ needs.test.outputs.version }}
           --packDir ./publish/${{ matrix.runtime }}
           --packTitle "SCTools — Star Citizen Companion"
           --packAuthors "SCTools Contributors"
           --mainExe SCTools.exe
           --channel ${{ matrix.runtime }}
           --runtime ${{ matrix.runtime }}
-          --targetDir ./releases
+          --targetDir ./velopack-out
 
-      - name: Upload Velopack release to GitHub
-        run: >
-          vpk upload github
-          --repoUrl https://github.com/${{ github.repository }}
-          --tag ${{ steps.version.outputs.tag }}
-          --token ${{ secrets.GITHUB_TOKEN }}
-          --releaseName "SCTools ${{ steps.version.outputs.version }}"
-          --channel ${{ matrix.runtime }}
-          --merge
-
-      - name: Upload artifacts
+      - name: Upload Velopack artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SCTools-velopack-${{ matrix.runtime }}
-          path: releases/
-          retention-days: 90
+          name: velopack-${{ matrix.runtime }}
+          path: velopack-out/
+          retention-days: 7
+
+  # ──────────────────────────────────────────────
+  # Stage 4: Create GitHub Release + attach all binaries
+  # ──────────────────────────────────────────────
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: [test, build, velopack]
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout (for changelog)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+          pattern: release-*
+
+      - name: Download all Velopack artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: velopack-artifacts/
+          pattern: velopack-*
+
+      - name: Collect release files
+        shell: bash
+        run: |
+          mkdir -p release-files
+
+          # ZIP binaries + SHA256
+          cp artifacts/release-win-x64/SCTools-win-x64.zip release-files/
+          cp artifacts/release-win-x64/SCTools-win-x64.zip.sha256 release-files/
+          cp artifacts/release-win-arm64/SCTools-win-arm64.zip release-files/
+          cp artifacts/release-win-arm64/SCTools-win-arm64.zip.sha256 release-files/
+
+          # Velopack packages (nupkg, setup, RELEASES)
+          cp velopack-artifacts/velopack-win-x64/* release-files/ 2>/dev/null || true
+          cp velopack-artifacts/velopack-win-arm64/* release-files/ 2>/dev/null || true
+
+          echo "### Release files:" >> "$GITHUB_STEP_SUMMARY"
+          ls -lh release-files/ >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Generate changelog
+        id: changelog
+        shell: bash
+        run: |
+          TAG="${{ needs.test.outputs.tag }}"
+          # Find the previous tag
+          PREV_TAG=$(git tag --sort=-v:refname | grep '^v' | head -2 | tail -1)
+          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" = "$TAG" ]; then
+            # First release — list all commits
+            CHANGES=$(git log --oneline --no-decorate HEAD)
+          else
+            CHANGES=$(git log --oneline --no-decorate "${PREV_TAG}..HEAD")
+          fi
+
+          # Write changelog to file (avoids multiline output issues)
+          cat > release-notes.md << NOTES_EOF
+          ## What's New
+
+          ${CHANGES}
+
+          ## Downloads
+
+          | Platform | File | Checksum |
+          |----------|------|----------|
+          | Windows x64 | \`SCTools-win-x64.zip\` | See \`.sha256\` file |
+          | Windows ARM64 | \`SCTools-win-arm64.zip\` | See \`.sha256\` file |
+
+          Self-contained — no .NET installation required.
+          After first install, future updates are delivered automatically via Velopack delta updates.
+          NOTES_EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.test.outputs.tag }}
+          name: SCTools ${{ needs.test.outputs.version }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: ${{ contains(needs.test.outputs.version, '-') }}
+          files: release-files/*
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

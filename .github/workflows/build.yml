@@ -13,7 +13,9 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
 jobs:
-  # Cross-platform Core build + tests (fast, runs on Linux)
+  # ──────────────────────────────────────────────
+  # Stage 1: Cross-platform Core (Linux, fast feedback)
+  # ──────────────────────────────────────────────
   core:
     name: Core (Linux)
     runs-on: ubuntu-latest
@@ -21,8 +23,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
@@ -33,47 +33,48 @@ jobs:
       - name: Restore
         run: dotnet restore src/SCTools.Core/ && dotnet restore tests/SCTools.Tests/
 
-      - name: Build Core
+      - name: Check formatting
+        run: |
+          dotnet format src/SCTools.Core/ --verify-no-changes --severity warn
+          dotnet format tests/SCTools.Tests/ --verify-no-changes --severity warn
+
+      - name: Build Core (warnings as errors)
         run: dotnet build src/SCTools.Core/ -c Release --no-restore
 
       - name: Build Tests
         run: dotnet build tests/SCTools.Tests/ -c Release --no-restore
 
-      - name: Run tests
+      - name: Run tests with coverage
         run: >
           dotnet test tests/SCTools.Tests/ -c Release --no-build
           --verbosity normal
           --collect:"XPlat Code Coverage"
           --results-directory ./TestResults
 
-      - name: Check formatting
-        run: |
-          dotnet format src/SCTools.Core/ --verify-no-changes --severity warn
-          dotnet format tests/SCTools.Tests/ --verify-no-changes --severity warn
-
-      - name: Upload coverage
+      - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: TestResults/**/coverage.cobertura.xml
-          retention-days: 7
+          retention-days: 14
 
-  # Full solution build on Windows (WPF + publish)
+  # ──────────────────────────────────────────────
+  # Stage 2: Full solution on Windows (WPF + publish)
+  # ──────────────────────────────────────────────
   windows:
     name: Windows (${{ matrix.runtime }})
     runs-on: windows-latest
     needs: core
 
     strategy:
+      fail-fast: false
       matrix:
         runtime: [win-x64, win-arm64]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
@@ -84,23 +85,24 @@ jobs:
       - name: Restore
         run: dotnet restore
 
-      - name: Build (strict — warnings as errors)
+      - name: Build (warnings as errors)
         run: dotnet build -c Release --no-restore
 
       - name: Run tests
         run: dotnet test -c Release --no-build --verbosity normal
 
-      - name: Publish
+      - name: Publish self-contained
         run: >
           dotnet publish src/SCTools.App/SCTools.App.csproj
-          -c Release -r ${{ matrix.runtime }}
+          -c Release
+          -r ${{ matrix.runtime }}
           --self-contained true
           -p:PublishSingleFile=true
           -p:PublishReadyToRun=true
           -p:IncludeNativeLibrariesForSelfExtract=true
           -o publish/${{ matrix.runtime }}
 
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: SCTools-${{ matrix.runtime }}
