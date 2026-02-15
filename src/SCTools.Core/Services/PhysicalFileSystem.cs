@@ -22,4 +22,26 @@ public sealed class PhysicalFileSystem : IFileSystem
         var versionInfo = FileVersionInfo.GetVersionInfo(filePath);
         return versionInfo.FileVersion?.Replace(',', '.');
     }
+
+    /// <inheritdoc />
+    public string ReadAllText(string filePath) => File.ReadAllText(filePath);
+
+    /// <inheritdoc />
+    public void WriteAllText(string filePath, string content) => File.WriteAllText(filePath, content);
+
+    /// <inheritdoc />
+    public string[] GetDirectories(string path) => Directory.GetDirectories(path);
+
+    /// <inheritdoc />
+    public void CreateDirectory(string path) => Directory.CreateDirectory(path);
+
+    /// <inheritdoc />
+    public void DeleteDirectory(string path) => Directory.Delete(path, recursive: true);
+
+    /// <inheritdoc />
+    public void DeleteFile(string path) => File.Delete(path);
+
+    /// <inheritdoc />
+    public void CopyFile(string sourcePath, string destinationPath, bool overwrite) =>
+        File.Copy(sourcePath, destinationPath, overwrite);
 }

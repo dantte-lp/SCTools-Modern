@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="SCTools.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Hashing: xxHash3 for fast integrity checks -->
     <PackageReference Include="System.IO.Hashing" Version="10.0.2" />
 
