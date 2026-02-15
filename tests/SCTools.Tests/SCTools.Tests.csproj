@@ -1,8 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework Condition="$([MSBuild]::IsOSPlatform('Windows'))">net10.0-windows</TargetFramework>
+    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Windows'))">net10.0</TargetFramework>
+    <RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</RuntimeIdentifier>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>SCTools.Tests</RootNamespace>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Test project analyzer suppressions:
+         CA1707: underscores in test names; CA1515: xUnit requires public classes;
+         CA1812: xUnit instantiates via reflection; SA0001/SA1600: XML docs off for tests -->
+    <NoWarn>CA1707;CA1515;CA1812;SA0001;SA1600</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,8 +35,18 @@
     </PackageReference>
   </ItemGroup>
 
+  <!-- Core is always referenced (cross-platform) -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\SCTools.Core\SCTools.Core.csproj" />
+  </ItemGroup>
+
+  <!-- App is Windows-only (WPF) -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <ProjectReference Include="..\..\src\SCTools.App\SCTools.App.csproj" />
+  </ItemGroup>
+
+  <!-- Exclude ViewModel tests on Linux (they depend on App/WPF) -->
+  <ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows'))">
+    <Compile Remove="ViewModels\**" />
   </ItemGroup>
 </Project>

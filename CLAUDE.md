@@ -21,20 +21,33 @@
 - **Tests:** xUnit v3 3.2.2 + NSubstitute 5.3.0 + FluentAssertions 8.8.0
 - **Analyzers:** StyleCop.Analyzers 1.2.0-beta.556, Microsoft.CodeAnalysis.NetAnalyzers 10.0.101
 
+## Container Development (Podman)
+
+Build and test inside a Podman OCI container (Debian trixie, .NET 10 SDK):
+
+```bash
+podman build -t sctools-dev -f Containerfile .   # Build dev image
+podman run --rm -v ./:/workspace:Z sctools-dev dotnet build src/SCTools.Core/ -c Release
+podman run --rm -v ./:/workspace:Z sctools-dev dotnet test tests/SCTools.Tests/ -c Release
+podman run --rm -v ./:/workspace:Z sctools-dev dotnet format src/SCTools.Core/ --verify-no-changes --severity warn
+```
+
+**Cross-platform split:** Core targets `net10.0` (builds on Linux), App targets `net10.0-windows` (Windows only, WPF). Tests auto-detect OS and exclude WPF-dependent tests on Linux.
+
 ## Key Commands
 
 ```bash
-dotnet build -c Release                          # Build
-dotnet test --no-build -c Release                # Tests
+dotnet build src/SCTools.Core/ -c Release        # Build Core (cross-platform)
+dotnet test tests/SCTools.Tests/ -c Release       # Tests (Core on Linux, all on Windows)
 dotnet format --verify-no-changes --severity warn # Format check
-dotnet build -c Release /p:TreatWarningsAsErrors=true -warnaserror # Strict build
+dotnet build -c Release -warnaserror              # Strict build (Windows only, full solution)
 ```
 
 ## Architecture (3 projects, Clean-ish MVVM)
 
-- `src/SCTools.App/` — WPF UI: Views (XAML), ViewModels, DI setup (App.xaml.cs)
-- `src/SCTools.Core/` — Pure .NET library: Models, Services (interfaces), Exceptions. NO UI deps.
-- `tests/SCTools.Tests/` — xUnit tests for ViewModels and Services
+- `src/SCTools.App/` — WPF UI: Views (XAML), ViewModels, DI setup (App.xaml.cs). **net10.0-windows only.**
+- `src/SCTools.Core/` — Pure .NET library: Models, Services, Exceptions. **net10.0 (cross-platform).**
+- `tests/SCTools.Tests/` — xUnit tests. Core tests run everywhere; ViewModel tests Windows-only.
 
 ## Async Rules
 
@@ -52,7 +65,7 @@ dotnet build -c Release /p:TreatWarningsAsErrors=true -warnaserror # Strict buil
 - DO NOT format code manually — hooks handle formatting automatically
 - All public APIs must have XML documentation (`<GenerateDocumentationFile>true</GenerateDocumentationFile>`)
 - Use primary constructors, file-scoped namespaces, pattern matching
-- Target `net10.0-windows` only
+- Core: `net10.0` (cross-platform), App: `net10.0-windows` (WPF)
 
 ## WPF UI Patterns (wpfui.lepo.co)
 
