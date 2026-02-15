@@ -4,7 +4,7 @@ FROM ${BASE_IMAGE}
 
 LABEL org.opencontainers.image.title="SCTools-Modern Dev"
 LABEL org.opencontainers.image.description="Development environment for SCTools-Modern (.NET 10, C# 14)"
-LABEL org.opencontainers.image.source="https://github.com/h0useRus/StarCitizen"
+LABEL org.opencontainers.image.source="https://github.com/dantte-lp/SCTools-Modern"
 
 # Avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive

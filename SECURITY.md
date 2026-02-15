@@ -12,7 +12,7 @@
 If you discover a security vulnerability, please report it responsibly:
 
 1. **Do NOT** open a public GitHub issue
-2. Send a private report via [GitHub Security Advisories](https://github.com/h0useRus/StarCitizen/security/advisories/new)
+2. Send a private report via [GitHub Security Advisories](https://github.com/dantte-lp/SCTools-Modern/security/advisories/new)
 3. Include: description of the vulnerability, steps to reproduce, potential impact
 
 You should receive an acknowledgment within 48 hours. We aim to release a fix within 7 days for critical vulnerabilities.
