@@ -7,13 +7,16 @@ on:
     branches: [main]
   workflow_dispatch:
 
-jobs:
-  build:
-    strategy:
-      matrix:
-        runtime: [win-x64, win-arm64]
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
-    runs-on: windows-latest
+jobs:
+  # Cross-platform Core build + tests (fast, runs on Linux)
+  core:
+    name: Core (Linux)
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -25,19 +28,67 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          cache: true
+          dotnet-quality: 'preview'
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore
+        run: dotnet restore src/SCTools.Core/ && dotnet restore tests/SCTools.Tests/
+
+      - name: Build Core
+        run: dotnet build src/SCTools.Core/ -c Release --no-restore
+
+      - name: Build Tests
+        run: dotnet build tests/SCTools.Tests/ -c Release --no-restore
+
+      - name: Run tests
+        run: >
+          dotnet test tests/SCTools.Tests/ -c Release --no-build
+          --verbosity normal
+          --collect:"XPlat Code Coverage"
+          --results-directory ./TestResults
 
       - name: Check formatting
-        run: dotnet format --verify-no-changes --severity warn
+        run: |
+          dotnet format src/SCTools.Core/ --verify-no-changes --severity warn
+          dotnet format tests/SCTools.Tests/ --verify-no-changes --severity warn
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: TestResults/**/coverage.cobertura.xml
+          retention-days: 7
+
+  # Full solution build on Windows (WPF + publish)
+  windows:
+    name: Windows (${{ matrix.runtime }})
+    runs-on: windows-latest
+    needs: core
+
+    strategy:
+      matrix:
+        runtime: [win-x64, win-arm64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Restore
+        run: dotnet restore
 
       - name: Build (strict — warnings as errors)
         run: dotnet build -c Release --no-restore
 
       - name: Run tests
-        run: dotnet test -c Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+        run: dotnet test -c Release --no-build --verbosity normal
 
       - name: Publish
         run: >
@@ -46,6 +97,7 @@ jobs:
           --self-contained true
           -p:PublishSingleFile=true
           -p:PublishReadyToRun=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
           -o publish/${{ matrix.runtime }}
 
       - name: Upload artifact
@@ -53,3 +105,4 @@ jobs:
         with:
           name: SCTools-${{ matrix.runtime }}
           path: publish/${{ matrix.runtime }}/
+          retention-days: 30
