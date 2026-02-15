@@ -47,8 +47,9 @@
     <ProjectReference Include="..\..\src\SCTools.App\SCTools.App.csproj" />
   </ItemGroup>
 
-  <!-- Exclude ViewModel tests on Linux (they depend on App/WPF) -->
+  <!-- ViewModels are in Core (cross-platform) — tests run on all platforms -->
+  <!-- WPF-specific integration tests (if any) should use AppIntegration\** folder -->
   <ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows'))">
-    <Compile Remove="ViewModels\**" />
+    <Compile Remove="AppIntegration\**" />
   </ItemGroup>
 </Project>

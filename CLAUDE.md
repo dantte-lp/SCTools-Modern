@@ -32,7 +32,7 @@ podman run --rm -v ./:/workspace:Z sctools-dev dotnet test tests/SCTools.Tests/ 
 podman run --rm -v ./:/workspace:Z sctools-dev dotnet format src/SCTools.Core/ --verify-no-changes --severity warn
 ```
 
-**Cross-platform split:** Core targets `net10.0` (builds on Linux), App targets `net10.0-windows` (Windows only, WPF). Tests auto-detect OS and exclude WPF-dependent tests on Linux.
+**Cross-platform split:** Core targets `net10.0` (builds on Linux), App targets `net10.0-windows` (Windows only, WPF). ViewModels live in Core (CommunityToolkit.Mvvm is cross-platform). Tests auto-detect OS; WPF integration tests excluded on Linux.
 
 ## Key Commands
 
@@ -45,9 +45,9 @@ dotnet build -c Release -warnaserror              # Strict build (Windows only, 
 
 ## Architecture (3 projects, Clean-ish MVVM)
 
-- `src/SCTools.App/` — WPF UI: Views (XAML), ViewModels, DI setup (App.xaml.cs). **net10.0-windows only.**
-- `src/SCTools.Core/` — Pure .NET library: Models, Services, Exceptions. **net10.0 (cross-platform).**
-- `tests/SCTools.Tests/` — xUnit tests. Core tests run everywhere; ViewModel tests Windows-only.
+- `src/SCTools.App/` — WPF UI: Views (XAML), DI setup (App.xaml.cs). **net10.0-windows only.**
+- `src/SCTools.Core/` — Pure .NET library: Models, Services, ViewModels, Helpers. **net10.0 (cross-platform).**
+- `tests/SCTools.Tests/` — xUnit tests. All tests (including ViewModels) run everywhere; WPF integration tests Windows-only.
 
 ## Async Rules
 

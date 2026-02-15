@@ -21,5 +21,8 @@
 
     <!-- Logging abstractions for services -->
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+
+    <!-- MVVM source generators (cross-platform, no UI dependency) -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
   </ItemGroup>
 </Project>
