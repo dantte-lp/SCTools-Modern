@@ -51,6 +51,8 @@ public partial class App : Application
             services.AddSingleton<IFileIndexService, FileIndexService>();
 
             // HTTP + GitHub API
+            services.AddSingleton<Octokit.IGitHubClient>(_ =>
+                new Octokit.GitHubClient(new Octokit.ProductHeaderValue("SCTools", "2.0")));
             services.AddHttpClient<IGitHubApiService, GitHubApiService>(client =>
             {
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("SCTools/2.0");
