@@ -18,5 +18,8 @@
 
     <!-- GitHub API (official SDK) -->
     <PackageReference Include="Octokit" Version="14.0.0" />
+
+    <!-- Logging abstractions for services -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
   </ItemGroup>
 </Project>
