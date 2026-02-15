@@ -9,8 +9,10 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <!-- Test project analyzer suppressions:
          CA1707: underscores in test names; CA1515: xUnit requires public classes;
-         CA1812: xUnit instantiates via reflection; SA0001/SA1600: XML docs off for tests -->
-    <NoWarn>CA1707;CA1515;CA1812;SA0001;SA1600</NoWarn>
+         CA1812: xUnit instantiates via reflection; SA0001/SA1600: XML docs off for tests;
+         CA2007: xUnit1030 conflicts with CA2007 (ConfigureAwait in tests);
+         IDE1006: Async suffix naming rule - test methods use descriptive names -->
+    <NoWarn>CA1707;CA1515;CA1812;SA0001;SA1600;CA2007;IDE1006</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
