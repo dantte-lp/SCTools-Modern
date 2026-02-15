@@ -1,0 +1,53 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Bb]uild/
+[Oo]ut/
+
+## Visual Studio
+.vs/
+*.code-workspace
+launchSettings.json
+
+## Rider
+.idea/
+*.DotSettings.user
+
+## NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+## Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Secrets
+.env
+.env.*
+secrets/
+*.key
+*.pfx
+*.p12
+
+## Logs
+logs/
+*.log
+
+## Publish
+publish/

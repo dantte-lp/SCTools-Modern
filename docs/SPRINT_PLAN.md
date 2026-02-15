@@ -1,0 +1,166 @@
+# Sprint Plan: SCTools Migration to .NET 10
+
+## Methodology
+
+Agile/Kanban с 1-недельными спринтами. Каждый спринт = 1 модуль или фича.
+Definition of Done: код компилируется без warnings, тесты проходят, analyzer clean.
+
+---
+
+## Sprint 0: Foundation (Infrastructure)
+
+**Goal:** Рабочий solution с CI/CD, анализаторами и пустыми проектами.
+
+- [ ] Создать `SCTools.sln` с 3 проектами (App, Core, Tests)
+- [ ] Настроить `Directory.Build.props` (общие свойства: TreatWarningsAsErrors, AnalysisLevel, Nullable)
+- [ ] Настроить `.editorconfig` с правилами C# 14
+- [ ] Добавить NuGet-пакеты: StyleCop.Analyzers, Microsoft.CodeAnalysis.NetAnalyzers
+- [ ] Настроить GitHub Actions: build + test + format check
+- [ ] Создать `App.xaml.cs` с DI через `Microsoft.Extensions.Hosting`
+- [ ] Настроить Serilog (file + debug sinks)
+- [ ] Smoke test: приложение запускается, DI работает, лог пишется
+- [ ] Написать первый unit-тест (health check)
+
+**Acceptance:** `dotnet build -c Release -warnaserror` = 0 warnings, `dotnet test` = green.
+
+---
+
+## Sprint 1: Core Models & Game Detection
+
+**Goal:** Перенести модели и логику обнаружения игры.
+
+- [ ] `GameMode.cs` — enum LIVE/PTU/EPTU
+- [ ] `GameInstallation.cs` — обнаружение папки Star Citizen
+- [ ] `GameConstants.cs` — пути, имена файлов, константы
+- [ ] `AppSettings.cs` — модель настроек (IOptions<T> pattern)
+- [ ] `appsettings.json` — конфигурация по умолчанию
+- [ ] Unit-тесты для GameInstallation (mock file system)
+- [ ] Unit-тесты для AppSettings validation
+
+**Acceptance:** Модели покрыты тестами, 0 analyzer warnings.
+
+---
+
+## Sprint 2: HTTP & GitHub API Service
+
+**Goal:** Работающий GitHub API клиент с rate limiting.
+
+- [ ] `IGitHubApiService.cs` — интерфейс
+- [ ] `GitHubApiService.cs` — реализация через IHttpClientFactory
+- [ ] JSON DTOs с source generators (`[JsonSerializable]`)
+- [ ] Rate limit handling (GitHubRequestLimitExceedException)
+- [ ] Auth token через Windows Credential Manager (NOT plaintext)
+- [ ] Unit-тесты с NSubstitute (mock HttpMessageHandler)
+- [ ] Integration test (optional, с real GitHub API)
+
+**Acceptance:** Получение списка релизов работает, токен в Credential Manager.
+
+---
+
+## Sprint 3: Language Pack Service
+
+**Goal:** Скачивание и установка локализаций.
+
+- [ ] `ILanguagePackService.cs` — интерфейс
+- [ ] `LanguagePackService.cs` — скачивание, верификация, установка
+- [ ] `LanguagePack.cs` — модель языкового пакета
+- [ ] Incremental download (FilesIndex с SHA-256 вместо MD5)
+- [ ] Path traversal protection (Path.GetFullPath + prefix check)
+- [ ] Content-Disposition validation
+- [ ] `IProgress<T>` для отчёта о прогрессе
+- [ ] Unit-тесты для всех edge cases
+
+**Acceptance:** Установка локализации работает end-to-end в тесте.
+
+---
+
+## Sprint 4: Game Config Service
+
+**Goal:** Чтение/запись user.cfg и профили настроек.
+
+- [ ] `IGameConfigService.cs` — интерфейс
+- [ ] `GameConfigService.cs` — парсинг и запись user.cfg
+- [ ] `ProfileManager.cs` — сохранение/загрузка профилей настроек
+- [ ] Integration с SCConfigDB (если пакет портирован на .NET 10)
+- [ ] Unit-тесты парсинга cfg
+
+**Acceptance:** Настройки читаются, пишутся, профили сохраняются.
+
+---
+
+## Sprint 5: Auto-Update Service (Velopack)
+
+**Goal:** Замена текущего update-механизма на Velopack.
+
+- [ ] `IAutoUpdateService.cs` — интерфейс
+- [ ] `AutoUpdateService.cs` — Velopack integration
+- [ ] `VelopackApp.Build().Run()` в Main()
+- [ ] GitHub Releases как источник обновлений
+- [ ] Delta updates (скачивание только изменений)
+- [ ] UI notification при доступном обновлении
+- [ ] Unit-тесты (mock update manager)
+
+**Acceptance:** Проверка обновлений работает, delta-download тестирован.
+
+---
+
+## Sprint 6: ViewModels (MVVM)
+
+**Goal:** ViewModels для всех экранов с CommunityToolkit.Mvvm.
+
+- [ ] `MainWindowViewModel.cs` — game mode selection, status
+- [ ] `SettingsViewModel.cs` — настройки приложения
+- [ ] `LocalizationViewModel.cs` — управление локализациями
+- [ ] `DownloadProgressViewModel.cs` — прогресс скачивания
+- [ ] `[ObservableProperty]` и `[RelayCommand]` source generators
+- [ ] Unit-тесты для каждого ViewModel (команды, состояния, ошибки)
+
+**Acceptance:** Все ViewModels тестируемы без UI, >80% coverage.
+
+---
+
+## Sprint 7: WPF Views (UI)
+
+**Goal:** XAML-представления с Fluent Theme.
+
+- [ ] `MainWindow.xaml` — основное окно с TabControl
+- [ ] `SettingsView.xaml` — настройки
+- [ ] `LocalizationView.xaml` — управление языками
+- [ ] `DownloadProgressDialog.xaml` — диалог прогресса
+- [ ] Fluent Theme integration (`<Application.Resources>`)
+- [ ] System tray via H.NotifyIcon.Wpf
+- [ ] Localization (en, ru, uk, ko, zh) через .resx
+
+**Acceptance:** UI работает, переключение тем, трей-иконка.
+
+---
+
+## Sprint 8: Polish & Release
+
+**Goal:** Финализация, CI/CD, code signing, документация.
+
+- [ ] GitHub Actions: build matrix (win-x64, win-arm64)
+- [ ] Self-contained + SingleFile + ReadyToRun publish
+- [ ] Code signing (SignPath Foundation или Azure Trusted Signing)
+- [ ] README.md (en, ru, uk) с скриншотами
+- [ ] Migration guide для пользователей старой версии
+- [ ] Final analyzer run: 0 warnings, 0 info
+- [ ] Performance benchmark vs old version
+
+**Acceptance:** Release-ready artifact, SmartScreen-clean, all docs updated.
+
+---
+
+## Velocity Tracking
+
+| Sprint | Planned | Completed | Notes |
+|--------|---------|-----------|-------|
+| 0 | - | - | |
+| 1 | - | - | |
+| 2 | - | - | |
+| 3 | - | - | |
+| 4 | - | - | |
+| 5 | - | - | |
+| 6 | - | - | |
+| 7 | - | - | |
+| 8 | - | - | |

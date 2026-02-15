@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\app-icon.ico</ApplicationIcon>
+    <AssemblyName>SCTools</AssemblyName>
+    <RootNamespace>SCTools.App</RootNamespace>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WPF UI — Fluent Design (https://wpfui.lepo.co) -->
+    <PackageReference Include="WPF-UI" Version="4.2.0" />
+    <PackageReference Include="WPF-UI.DependencyInjection" Version="4.2.0" />
+
+    <!-- MVVM -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+
+    <!-- DI / Hosting / Configuration -->
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+
+    <!-- HTTP -->
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
+
+    <!-- Logging (Serilog) -->
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+
+    <!-- System Tray -->
+    <PackageReference Include="H.NotifyIcon.Wpf" Version="2.4.1" />
+
+    <!-- Auto-Update (Velopack) -->
+    <PackageReference Include="Velopack" Version="0.0.1298" />
+
+    <!-- Secrets: Windows Credential Manager -->
+    <PackageReference Include="Meziantou.Framework.Win32.CredentialManager" Version="1.7.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SCTools.Core\SCTools.Core.csproj" />
+  </ItemGroup>
+</Project>

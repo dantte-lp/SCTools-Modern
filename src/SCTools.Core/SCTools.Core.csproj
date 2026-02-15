@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SCTools.Core</RootNamespace>
+    <AssemblyName>SCTools.Core</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Hashing: xxHash3 for fast integrity checks -->
+    <PackageReference Include="System.IO.Hashing" Version="10.0.2" />
+
+    <!-- Archives: 7z/tar.gz support (ZIP is built-in) -->
+    <PackageReference Include="SharpCompress" Version="0.41.0" />
+
+    <!-- GitHub API (official SDK) -->
+    <PackageReference Include="Octokit" Version="14.0.0" />
+  </ItemGroup>
+</Project>
